@@ -20,6 +20,7 @@ spec:
       repositories:
       - names:
         - captest_git-source
+        - example-multiservice
         owner: codefresh-contrib
       repository: ""
       webhook:
