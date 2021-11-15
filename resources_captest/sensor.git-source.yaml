@@ -6,7 +6,7 @@ metadata:
 spec:
   dependencies:
   - eventName: push
-    eventSourceName: github
+    eventSourceName: github1
     name: github-dep
   eventBusName: codefresh-eventbus
   template:
