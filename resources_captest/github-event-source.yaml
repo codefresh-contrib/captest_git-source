@@ -29,7 +29,6 @@ spec:
         # port: "13000"
         # url: http://replace-with-real-public-url
         url: https://ae0c7274421cb48deb1246e561001c35-191698994.us-east-2.elb.amazonaws.com
-        port: "80"
   service:
     ports:
     - port: 13000
