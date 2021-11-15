@@ -32,6 +32,6 @@ spec:
         port: "80"
   service:
     ports:
-    - port: 13000
+    - port: 15000
       targetPort: 0
 status: {}
