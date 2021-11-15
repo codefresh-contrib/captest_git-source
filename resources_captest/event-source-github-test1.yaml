@@ -25,7 +25,7 @@ spec:
         owner: codefresh-contrib
       repository: ""
       webhook:
-        endpoint: /git-source/
+        endpoint: /git-source-test/
         method: POST
         # port: "13000"
         # url: http://replace-with-real-public-url
