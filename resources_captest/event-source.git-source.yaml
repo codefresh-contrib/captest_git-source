@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  creationTimestamp: null
+  name: github
+spec:
+  eventBusName: codefresh-eventbus
+  github:
+    push:
+      active: true
+      apiToken:
+        key: git_token
+        name: autopilot-secret
+      contentType: json
+      events:
+      - push
+      id: 0
+      insecure: true
+      owner: ""
+      repositories:
+      - names:
+        - captest_git-source
+        owner: codefresh-contrib
+      repository: ""
+      webhook:
+        endpoint: /git-source/
+        method: POST
+        port: "13000"
+        url: http://replace-with-real-public-url
+  service:
+    ports:
+    - port: 13000
+      targetPort: 0
+status: {}

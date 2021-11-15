@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: github
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: github-eventsource-svc
+            port:
+              number: 13000
+        path: /git-source/
+        pathType: ImplementationSpecific
+status:
+  loadBalancer: {}
