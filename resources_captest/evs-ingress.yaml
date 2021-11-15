@@ -1,0 +1,35 @@
+# test test test11
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  creationTimestamp: null
+  name: github
+spec:
+  eventBusName: codefresh-eventbus
+  github:
+    push:
+      active: true
+      apiToken:
+        key: git_token
+        name: autopilot-secret
+      contentType: json
+      events:
+      - push
+      id: 0
+      insecure: true
+      owner: ""
+      repositories:
+      - names:
+        - captest_git-source
+        owner: codefresh-contrib
+      repository: ""
+      webhook:
+        endpoint: /git-source-ingress/
+        method: POST
+        url: http://ae0c7274421cb48deb1246e561001c35-191698994.us-east-2.elb.amazonaws.com
+        port: "80"
+  service:
+    ports:
+    - port: 15000
+      targetPort: 0
+status: {}
