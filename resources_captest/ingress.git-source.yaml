@@ -14,7 +14,7 @@ spec:
             name: github-eventsource-svc
             port:
               number: 15000
-        path: /git-source/
+        path: /git-source-test/
         pathType: ImplementationSpecific
 status:
   loadBalancer: {}
