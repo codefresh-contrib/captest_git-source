@@ -27,6 +27,7 @@ spec:
         endpoint: /git-source-ingress/
         method: POST
         url: http://ae0c7274421cb48deb1246e561001c35-191698994.us-east-2.elb.amazonaws.com
+        port: "80"
   service:
     ports:
     - port: 13000
