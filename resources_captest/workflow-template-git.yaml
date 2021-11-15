@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: git
+spec:
+  templates:
+
+    # func clone(REPO, REVISION=main, GIT_TOKEN_SECRET) repo {
+    # ...
+    # }
+
+  - name: clone
+    inputs:
+      parameters:
+      - name: REPO
+      - name: REVISION
+        default: main
+      - name: GIT_TOKEN_SECRET
+      artifacts:
+      - name: repo
+        path: /tmp/repo
+        git:
+          repo: '{{ inputs.parameters.REPO }}'
+          revision: '{{ inputs.parameters.REVISION }}'
+          usernameSecret:
+            name: '{{ inputs.parameters.GIT_TOKEN_SECRET }}'
+            key: token
+    outputs:
+      artifacts:
+      - name: repo
+        path: /tmp/repo
+        s3:
+          key: '{{ workflow.name }}/git-repo'
+    container:
+      image: alpine
+      workingDir: '{{ inputs.artifacts.repo.path }}'
+      command: [sh, -c]
+      args: ["ls"]
