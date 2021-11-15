@@ -203,42 +203,50 @@ spec:
           #           {{ tasks.service-version.outputs.result }}-{{
           #           workflow.parameters.GIT_BRANCH }}-{{
           #           workflow.parameters.GIT_REVISION_SHORT }}
-            depends: service-version.Succeeded
-          - name: build-images
-            templateRef:
-              name: kaniko
-              template: build
-            arguments:
-              artifacts:
-                - name: repo
-                  from: '{{ tasks.repo.outputs.artifacts.repo }}'
-              parameters:
-                - name: BRANCH_IMAGE
-                  value: >-
-                    gcr.io/codefresh-sa/salesdemocf/buslog:{{ workflow.parameters.GIT_BRANCH }}-{{ workflow.parameters.GIT_REVISION_SHORT }}
-                - name: PERMANENT_IMAGE
-                  value: >-
-                    gcr.io/codefresh-sa/salesdemocf/buslog:latest
-                - name: DOCKERFILE
-                  # value: apps/{{ item }}/Dockerfile
-                  value: buslog/Dockerfile
-                - name: APP
-                  # value: '{{ item }}'
-                  value: buslog
-                - name: GIT_BRANCH
-                  value: '{{ workflow.parameters.GIT_BRANCH }}'
-                - name: GIT_REPO_OWNER
-                  value: '{{ workflow.parameters.GIT_REPO_OWNER }}'
-                - name: GIT_REPO_NAME
-                  value: '{{ workflow.parameters.GIT_REPO_NAME }}'
-                - name: GIT_REVISION
-                  value: '{{ workflow.parameters.GIT_REVISION }}'
-                - name: GIT_COMMIT_MESSAGE
-                  value: '{{ workflow.parameters.GIT_COMMIT_MESSAGE }}'
-                - name: GIT_COMMIT_URL
-                  value: '{{ workflow.parameters.GIT_COMMIT_URL }}'
-            # depends: app-list && artifact-version
-            # withParam: '{{ tasks.app-list.outputs.result }}'
+
+
+
+
+          #   depends: service-version.Succeeded
+          # - name: build-images
+          #   templateRef:
+          #     name: kaniko
+          #     template: build
+          #   arguments:
+          #     artifacts:
+          #       - name: repo
+          #         from: '{{ tasks.repo.outputs.artifacts.repo }}'
+          #     parameters:
+          #       - name: BRANCH_IMAGE
+          #         value: >-
+          #           gcr.io/codefresh-sa/salesdemocf/buslog:{{ workflow.parameters.GIT_BRANCH }}-{{ workflow.parameters.GIT_REVISION_SHORT }}
+          #       - name: PERMANENT_IMAGE
+          #         value: >-
+          #           gcr.io/codefresh-sa/salesdemocf/buslog:latest
+          #       - name: DOCKERFILE
+          #         # value: apps/{{ item }}/Dockerfile
+          #         value: buslog/Dockerfile
+          #       - name: APP
+          #         # value: '{{ item }}'
+          #         value: buslog
+          #       - name: GIT_BRANCH
+          #         value: '{{ workflow.parameters.GIT_BRANCH }}'
+          #       - name: GIT_REPO_OWNER
+          #         value: '{{ workflow.parameters.GIT_REPO_OWNER }}'
+          #       - name: GIT_REPO_NAME
+          #         value: '{{ workflow.parameters.GIT_REPO_NAME }}'
+          #       - name: GIT_REVISION
+          #         value: '{{ workflow.parameters.GIT_REVISION }}'
+          #       - name: GIT_COMMIT_MESSAGE
+          #         value: '{{ workflow.parameters.GIT_COMMIT_MESSAGE }}'
+          #       - name: GIT_COMMIT_URL
+          #         value: '{{ workflow.parameters.GIT_COMMIT_URL }}'
+          #   # depends: app-list && artifact-version
+          #   # withParam: '{{ tasks.app-list.outputs.result }}'
+
+
+
+
     #       - name: report-images-revision
     #         templateRef:
     #           name: common-util
