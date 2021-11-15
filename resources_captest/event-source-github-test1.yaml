@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: EventSource
 metadata:
   creationTimestamp: null
-  name: github-test1
+  name: github
 spec:
   eventBusName: codefresh-eventbus
   github:
