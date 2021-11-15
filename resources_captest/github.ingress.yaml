@@ -13,7 +13,7 @@ spec:
           service:
             name: github1-eventsource-svc
             port:
-              number: 15000
+              number: 13000
         path: /git-source/
         pathType: ImplementationSpecific
 status:
