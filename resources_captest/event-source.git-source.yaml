@@ -25,8 +25,9 @@ spec:
       webhook:
         endpoint: /git-source/
         method: POST
-        port: "13000"
-        url: http://replace-with-real-public-url
+        # port: "13000"
+        # url: http://replace-with-real-public-url
+        url: ae0c7274421cb48deb1246e561001c35-191698994.us-east-2.elb.amazonaws.com
   service:
     ports:
     - port: 13000
