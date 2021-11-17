@@ -11,13 +11,14 @@ spec:
   podGC:
     strategy: OnWorkflowCompletion
   serviceAccountName: codefresh-sa
+
   templates:
   - container:
-      args:
-      - '{{inputs.parameters.message}}'
+      image: docker/whalesay:latest
       command:
       - cowsay
-      image: docker/whalesay:latest
+      args:
+      - '{{inputs.parameters.message}}'
       name: ""
       resources: {}
     inputs:
