@@ -12,6 +12,7 @@ spec:
     strategy: OnWorkflowCompletion
   serviceAccountName: codefresh-sa
 
+
   templates:
   - container:
       image: docker/whalesay:latest
