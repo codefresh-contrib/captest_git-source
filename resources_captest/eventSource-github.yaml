@@ -21,6 +21,7 @@ spec:
       repositories:
       - names:
         - captest_git-source
+        - example-multiservice-deploy2
         owner: codefresh-contrib
       repository: ""
       webhook:
