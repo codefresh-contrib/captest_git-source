@@ -27,7 +27,7 @@ spec:
             type: string
             value:
               - "test/"
-            template: "{{ substr 0 5 .Input }}"
+            template: "{{ substr 0 4 .Input }}"
     - name: multiservice-qa
       eventSourceName: github1
       eventName: push
