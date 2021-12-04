@@ -126,7 +126,7 @@ spec:
             - dest: spec.arguments.parameters.1.value  # GIT_REVISION
               src:
                 dependencyName: multiservice-test
-                dataKey: dataKey: body.after
+                dataKey: body.after
             - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
               src:
                 dependencyName: multiservice-test
@@ -200,7 +200,7 @@ spec:
             - dest: spec.arguments.parameters.1.value  # GIT_REVISION
               src:
                 dependencyName: multiservice-test
-                dataKey: dataKey: body.after
+                dataKey: body.after
             - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
               src:
                 dependencyName: multiservice-test
@@ -274,7 +274,7 @@ spec:
             - dest: spec.arguments.parameters.1.value  # GIT_REVISION
               src:
                 dependencyName: multiservice-test
-                dataKey: dataKey: body.after
+                dataKey: body.after
             - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
               src:
                 dependencyName: multiservice-test
@@ -348,7 +348,7 @@ spec:
             - dest: spec.arguments.parameters.1.value  # GIT_REVISION
               src:
                 dependencyName: multiservice-test
-                dataKey: dataKey: body.after
+                dataKey: body.after
             - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
               src:
                 dependencyName: multiservice-test
