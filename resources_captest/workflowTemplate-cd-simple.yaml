@@ -53,12 +53,23 @@ spec:
     inputs:
       parameters:
       - name: INFO
+      - name: GIT_REPO_URL
+      - name: GIT_REVISION
+      - name: GIT_BRANCH
+      - name: GIT_FILES_MODIFIED
+      - name: GIT_FILES_ADDED
+      - name: GIT_REPO_OWNER
+      - name: GIT_REPO_NAME
+      - name: GIT_COMMIT_MESSAGE
+      - name: GIT_COMMIT_URL
+      - name: ARGOCD_APP
+      - name: ARGOCD_SERVER
     script:
       image: alpine:latest
       command: ["/bin/sh"]
       env:
       - name: INFO
-        value: '{{ inputs.parameters.INFO }}'
+        value: '{{ inputs.parameters | join "\n" }}'
       source: |
         set -e
         echo ${INFO}
