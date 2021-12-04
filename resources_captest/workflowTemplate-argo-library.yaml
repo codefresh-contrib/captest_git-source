@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: codefresh.argo-library
+  labels:
+    owner: codefresh
+spec:
+  templates:
+  
+  - name: argocd-sync
+    inputs:
+      parameters:
+      - name: APP         # Name of the app in Argo CD to sync
+      - name: SERVER      # FQDN (and optional port) of Argo CD server
+      - name: USERNAME    # Username for authentication to Argo CD server
+        default: admin
+      - name: SECRET      # Name of a K8 Secret from which to get the password for authentication
+        default: argocd-initial-admin-secret
+      - name: SYNC_FLAGS  # argocd CLI flags such as: --grpc-web --insecure --plaintext --loglevel debug
+        default: "--insecure --plaintext"
+      - name: WAIT_FLAGS  # Specify an event that this template should wait for
+        default: ""
+        # "" - skip waiting
+        # "--sync" - wait for Sync Status = Synced
+        # "--health" - wait for Health Status = Healthy
+        # "--suspended" -  wait for Health Status = Suspended (use with Argo Rollouts)
+    script:
+      image: quay.io/argoproj/argocd:release-2.1
+      command: ["/bin/sh"]
+      env:
+      - name: APP
+        value: '{{ inputs.parameters.APP }}'
+      - name: SERVER
+        value: '{{ inputs.parameters.SERVER }}'
+      - name: USERNAME
+        value: '{{ inputs.parameters.USERNAME }}'
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: '{{ inputs.parameters.SECRET }}'
+            key: password
+      - name: SYNC_FLAGS
+        value: '{{ inputs.parameters.SYNC_FLAGS }}'
+      - name: WAIT_FLAGS
+        value: '{{ inputs.parameters.WAIT_FLAGS }}'
+      source: |
+        set -e
+
+        if [ -z "${APP}" ]; then echo 'Missing required param: APP'; exit 1; fi
+        if [ -z "${SERVER}" ]; then echo 'Missing required param: SERVER'; exit 1; fi
+
+        echo Authenticating to Argo CD server ${SERVER}...
+        argocd login ${SERVER} --username ${USERNAME} --password ${PASSWORD} ${SYNC_FLAGS}
+
+        # when using token instead of user/pass, add --auth-token ${TOKEN}
+        CMD="argocd app sync ${APP} --async --server ${SERVER} ${SYNC_FLAGS}"
+        echo ${CMD}
+        eval $CMD
+
+        # Optionally wait for a specific status event
+        if [ -n "${WAIT_FLAGS}" ]; then
+            CMD="argocd app wait ${APP} ${WAIT_FLAGS}"
+            echo ${CMD}
+            eval ${CMD}
+        else
+            echo '$WAIT_FLAGS is not specified - skipping wait.'
+        fi
