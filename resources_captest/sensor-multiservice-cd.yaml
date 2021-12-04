@@ -12,16 +12,16 @@ spec:
     - name: multiservice-test
       eventSourceName: github1
       eventName: push
-      filters:
-        data:
-          - path: body.repository.owner.name
-            type: string
-            value:
-              - codefresh-contrib
-          - path: body.repository.name
-            type: string
-            value:
-              - example-multiservice-deploy2
+      # filters:
+      #   data:
+      #     - path: body.repository.owner.name
+      #       type: string
+      #       value:
+      #         - codefresh-contrib
+      #     - path: body.repository.name
+      #       type: string
+      #       value:
+      #         - example-multiservice-deploy2
           # filter monorepo changes for only the "test" subdirectory
           # - path: body.head_commit.modified
           #   type: string
