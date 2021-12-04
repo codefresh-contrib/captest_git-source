@@ -1,0 +1,386 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: multiservice-cd
+spec:
+  eventBusName: codefresh-eventbus
+  template:
+    serviceAccountName: argo
+
+  # Add a dependency for each microservice environment (ex: test, qa, stage, prod)
+  dependencies:
+    - name: multiservice-test
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "test" subdirectory
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "test/"
+            template: "{{ substr 0 5 .Input }}"
+    - name: multiservice-qa
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "qa" subdirectory
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "qa/"
+            template: "{{ substr 0 3 .Input }}"
+    - name: multiservice-stage
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "stage" subdirectory
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "stage/"
+            template: "{{ substr 0 6 .Input }}"
+    - name: multiservice-prod
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "prod" subdirectory
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "prod/"
+            template: "{{ substr 0 5 .Input }}"
+
+  # Add a trigger (creates workflow) for each dependency
+  triggers:
+    - template:
+        conditions: "multiservice-test"  # you can combine dependencies with && and ||
+        name: multiservice-test
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: multiservice-test-
+              spec:
+                workflowTemplateRef:
+                  name: cd-simple
+                arguments:
+                  parameters:
+                    - name: GIT_REPO_URL
+                    - name: GIT_REVISION
+                    - name: GIT_BRANCH
+                    - name: GIT_FILES_MODIFIED
+                    - name: GIT_FILES_ADDED
+                    - name: GIT_REPO_OWNER
+                    - name: GIT_REPO_NAME
+                    - name: GIT_COMMIT_MESSAGE
+                    - name: GIT_COMMIT_URL
+                    - name: ARGOCD_APP
+                    - name: ARGOCD_SERVER
+          parameters:
+            - dest: spec.arguments.parameters.0.value  # GIT_REPO_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.clone_url
+            - dest: spec.arguments.parameters.1.value  # GIT_REVISION
+              src:
+                dependencyName: multiservice-test
+                dataKey: dataKey: body.after
+            - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
+              src:
+                dependencyName: multiservice-test
+                dataTemplate: "{{ trimPrefix \"refs/heads/\" .Input.body.ref }}"
+            - dest: spec.arguments.parameters.3.value  # GIT_FILES_MODIFIED
+              # TO-DO - include modified files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.modified
+            - dest: spec.arguments.parameters.4.value  # GIT_FILES_ADDED
+              # TO-DO - include added files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.added
+            - dest: spec.arguments.parameters.5.value  # GIT_REPO_OWNER
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.owner.name
+            - dest: spec.arguments.parameters.6.value  # GIT_REPO_NAME
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.name
+            - dest: spec.arguments.parameters.7.value  # GIT_COMMIT_MESSAGE
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.message
+            - dest: spec.arguments.parameters.8.value  # GIT_COMMIT_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.url
+            - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
+              value: multiservice-test
+            - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
+              # K8s-internal DNS address of the Argo CD service
+              value: argocd-server.captest
+    - template:
+        conditions: "multiservice-qa"  # you can combine dependencies with && and ||
+        name: multiservice-qa
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: multiservice-test-
+              spec:
+                workflowTemplateRef:
+                  name: cd-simple
+                arguments:
+                  parameters:
+                    - name: GIT_REPO_URL
+                    - name: GIT_REVISION
+                    - name: GIT_BRANCH
+                    - name: GIT_FILES_MODIFIED
+                    - name: GIT_FILES_ADDED
+                    - name: GIT_REPO_OWNER
+                    - name: GIT_REPO_NAME
+                    - name: GIT_COMMIT_MESSAGE
+                    - name: GIT_COMMIT_URL
+                    - name: ARGOCD_APP
+                    - name: ARGOCD_SERVER
+          parameters:
+            - dest: spec.arguments.parameters.0.value  # GIT_REPO_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.clone_url
+            - dest: spec.arguments.parameters.1.value  # GIT_REVISION
+              src:
+                dependencyName: multiservice-test
+                dataKey: dataKey: body.after
+            - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
+              src:
+                dependencyName: multiservice-test
+                dataTemplate: "{{ trimPrefix \"refs/heads/\" .Input.body.ref }}"
+            - dest: spec.arguments.parameters.3.value  # GIT_FILES_MODIFIED
+              # TO-DO - include modified files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.modified
+            - dest: spec.arguments.parameters.4.value  # GIT_FILES_ADDED
+              # TO-DO - include added files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.added
+            - dest: spec.arguments.parameters.5.value  # GIT_REPO_OWNER
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.owner.name
+            - dest: spec.arguments.parameters.6.value  # GIT_REPO_NAME
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.name
+            - dest: spec.arguments.parameters.7.value  # GIT_COMMIT_MESSAGE
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.message
+            - dest: spec.arguments.parameters.8.value  # GIT_COMMIT_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.url
+            - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
+              value: multiservice-qa
+            - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
+              # K8s-internal DNS address of the Argo CD service
+              value: argocd-server.captest
+    - template:
+        conditions: "multiservice-stage"  # you can combine dependencies with && and ||
+        name: multiservice-stage
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: multiservice-test-
+              spec:
+                workflowTemplateRef:
+                  name: cd-simple
+                arguments:
+                  parameters:
+                    - name: GIT_REPO_URL
+                    - name: GIT_REVISION
+                    - name: GIT_BRANCH
+                    - name: GIT_FILES_MODIFIED
+                    - name: GIT_FILES_ADDED
+                    - name: GIT_REPO_OWNER
+                    - name: GIT_REPO_NAME
+                    - name: GIT_COMMIT_MESSAGE
+                    - name: GIT_COMMIT_URL
+                    - name: ARGOCD_APP
+                    - name: ARGOCD_SERVER
+          parameters:
+            - dest: spec.arguments.parameters.0.value  # GIT_REPO_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.clone_url
+            - dest: spec.arguments.parameters.1.value  # GIT_REVISION
+              src:
+                dependencyName: multiservice-test
+                dataKey: dataKey: body.after
+            - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
+              src:
+                dependencyName: multiservice-test
+                dataTemplate: "{{ trimPrefix \"refs/heads/\" .Input.body.ref }}"
+            - dest: spec.arguments.parameters.3.value  # GIT_FILES_MODIFIED
+              # TO-DO - include modified files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.modified
+            - dest: spec.arguments.parameters.4.value  # GIT_FILES_ADDED
+              # TO-DO - include added files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.added
+            - dest: spec.arguments.parameters.5.value  # GIT_REPO_OWNER
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.owner.name
+            - dest: spec.arguments.parameters.6.value  # GIT_REPO_NAME
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.name
+            - dest: spec.arguments.parameters.7.value  # GIT_COMMIT_MESSAGE
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.message
+            - dest: spec.arguments.parameters.8.value  # GIT_COMMIT_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.url
+            - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
+              value: multiservice-stage
+            - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
+              # K8s-internal DNS address of the Argo CD service
+              value: argocd-server.captest
+    - template:
+        conditions: "multiservice-prod"  # you can combine dependencies with && and ||
+        name: multiservice-prod
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: multiservice-test-
+              spec:
+                workflowTemplateRef:
+                  name: cd-simple
+                arguments:
+                  parameters:
+                    - name: GIT_REPO_URL
+                    - name: GIT_REVISION
+                    - name: GIT_BRANCH
+                    - name: GIT_FILES_MODIFIED
+                    - name: GIT_FILES_ADDED
+                    - name: GIT_REPO_OWNER
+                    - name: GIT_REPO_NAME
+                    - name: GIT_COMMIT_MESSAGE
+                    - name: GIT_COMMIT_URL
+                    - name: ARGOCD_APP
+                    - name: ARGOCD_SERVER
+          parameters:
+            - dest: spec.arguments.parameters.0.value  # GIT_REPO_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.clone_url
+            - dest: spec.arguments.parameters.1.value  # GIT_REVISION
+              src:
+                dependencyName: multiservice-test
+                dataKey: dataKey: body.after
+            - dest: spec.arguments.parameters.2.value  # GIT_BRANCH
+              src:
+                dependencyName: multiservice-test
+                dataTemplate: "{{ trimPrefix \"refs/heads/\" .Input.body.ref }}"
+            - dest: spec.arguments.parameters.3.value  # GIT_FILES_MODIFIED
+              # TO-DO - include modified files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.modified
+            - dest: spec.arguments.parameters.4.value  # GIT_FILES_ADDED
+              # TO-DO - include added files from ALL commits of the push
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.added
+            - dest: spec.arguments.parameters.5.value  # GIT_REPO_OWNER
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.owner.name
+            - dest: spec.arguments.parameters.6.value  # GIT_REPO_NAME
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.repository.name
+            - dest: spec.arguments.parameters.7.value  # GIT_COMMIT_MESSAGE
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.message
+            - dest: spec.arguments.parameters.8.value  # GIT_COMMIT_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.head_commit.url
+            - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
+              value: multiservice-prod
+            - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
+              # K8s-internal DNS address of the Argo CD service
+              value: argocd-server.captest
