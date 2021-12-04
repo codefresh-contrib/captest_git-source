@@ -40,7 +40,7 @@ spec:
     - retryStrategy:
         steps: 3
       template:
-        conditions: "multiservice-test"  # you can combine dependencies with && and ||
+        # conditions: "multiservice-test"  # you can combine dependencies with && and ||
         name: multiservice-test
         argoWorkflow:
           version: v1alpha1
