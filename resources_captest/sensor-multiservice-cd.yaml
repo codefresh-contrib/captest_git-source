@@ -34,7 +34,7 @@ spec:
             value:
               - "true"
             template: >-
-              {{ contains '"test/' .Input }}
+              {{ contains "\"test/" .Input }}
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
