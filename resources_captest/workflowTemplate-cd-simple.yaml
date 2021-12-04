@@ -27,10 +27,6 @@ spec:
     #     template: slack-notfier
     - - name: log-info
         template: log-info
-        arguments:
-          parameters:
-          - name: INFO
-            value: "{{workflow.parameters.GIT_FILES_MODIFIED}}"
     - - name: argocd-sync
         templateRef:
           name: codefresh.argo-library
@@ -50,15 +46,12 @@ spec:
     # - - name: slack-announce-finish-deployment
     #     template: slack-notfier
   - name: log-info
-    inputs:
-      parameters:
-      - name: INFO
     script:
       image: alpine:latest
       command: ["/bin/sh"]
       env:
       - name: INFO
-        value: '{{ inputs.parameters | join "\n" }}'
+        value: '{{ workflow.parameters | join "\n" }}'
       source: |
         set -e
         echo ${INFO}
