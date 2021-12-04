@@ -91,7 +91,7 @@ spec:
     - retryStrategy:
         steps: 3
       template:
-        # conditions: "multiservice-test"  # you can combine dependencies with && and ||
+        conditions: "multiservice-test"  # you can combine dependencies with && and ||
         name: multiservice-test
         argoWorkflow:
           version: v1alpha1
@@ -161,11 +161,6 @@ spec:
               src:
                 dependencyName: multiservice-test
                 dataKey: body.head_commit.url
-            # - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
-            #     value: multiservice-test
-            # - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
-            #     # K8s-internal DNS address of the Argo CD service
-            #     value: argocd-server.captest
     # - template:
     #     conditions: "multiservice-qa"  # you can combine dependencies with && and ||
     #     name: multiservice-qa
