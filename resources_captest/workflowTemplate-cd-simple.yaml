@@ -51,7 +51,7 @@ spec:
       command: ["/bin/sh"]
       env:
       - name: INFO
-        value: '{{ workflow.parameters | join "\n" }}'
+        value: "{{ workflow.parameters | join \"\n\" }}"
       source: |
         set -e
         echo ${INFO}
