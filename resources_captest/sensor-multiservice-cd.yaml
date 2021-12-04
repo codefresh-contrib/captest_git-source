@@ -1,3 +1,6 @@
+# To debug:
+# kubectl describe sensor multiservice-cd
+
 apiVersion: argoproj.io/v1alpha1
 kind: Sensor
 metadata:
@@ -23,68 +26,72 @@ spec:
             value:
               - example-multiservice-deploy2
           # filter monorepo changes for only the "test" subdirectory
-          # - path: body.head_commit.modified
-          #   type: string
-          #   value:
-          #     - "test/"
-          #   template: "{{ substr 0 5 .Input }}"
-    # - name: multiservice-qa
-    #   eventSourceName: github1
-    #   eventName: push
-    #   filters:
-    #     data:
-    #       - path: body.repository.owner.name
-    #         type: string
-    #         value:
-    #           - codefresh-contrib
-    #       - path: body.repository.name
-    #         type: string
-    #         value:
-    #           - example-multiservice-deploy2
-    #       # filter monorepo changes for only the "qa" subdirectory
-    #       - path: body.head_commit.modified
-    #         type: string
-    #         value:
-    #           - "qa/"
-    #         template: "{{ substr 0 3 .Input }}"
-    # - name: multiservice-stage
-    #   eventSourceName: github1
-    #   eventName: push
-    #   filters:
-    #     data:
-    #       - path: body.repository.owner.name
-    #         type: string
-    #         value:
-    #           - codefresh-contrib
-    #       - path: body.repository.name
-    #         type: string
-    #         value:
-    #           - example-multiservice-deploy2
-    #       # filter monorepo changes for only the "stage" subdirectory
-    #       - path: body.head_commit.modified
-    #         type: string
-    #         value:
-    #           - "stage/"
-    #         template: "{{ substr 0 6 .Input }}"
-    # - name: multiservice-prod
-      # eventSourceName: github1
-      # eventName: push
-      # filters:
-      #   data:
-      #     - path: body.repository.owner.name
-      #       type: string
-      #       value:
-      #         - codefresh-contrib
-      #     - path: body.repository.name
-      #       type: string
-      #       value:
-      #         - example-multiservice-deploy2
-      #     # filter monorepo changes for only the "prod" subdirectory
-      #     - path: body.head_commit.modified
-      #       type: string
-      #       value:
-      #         - "prod/"
-      #       template: "{{ substr 0 5 .Input }}"
+          # Example body.head_commit.modified string: '["test/values.yaml", "test/chart.yaml"]'
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "true"
+            template: "{{ contains '\"test/' .Input }}"
+    - name: multiservice-qa
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "qa" subdirectory
+          # Example body.head_commit.modified string: '["qa/values.yaml", "qa/chart.yaml"]'
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "true"
+            template: "{{ contains '\"qa/' .Input }}"
+    - name: multiservice-stage
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "stage" subdirectory
+          # Example body.head_commit.modified string: '["stage/values.yaml", "stage/chart.yaml"]'
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "true"
+            template: "{{ contains '\"stage/' .Input }}"
+    - name: multiservice-prod
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # filter monorepo changes for only the "prod" subdirectory
+          # Example body.head_commit.modified string: '["prod/values.yaml", "prod/chart.yaml"]'
+          - path: body.head_commit.modified
+            type: string
+            value:
+              - "true"
+            template: "{{ contains '\"prod/' .Input }}"
 
   # Add a trigger (creates workflow) for each dependency
   triggers:
