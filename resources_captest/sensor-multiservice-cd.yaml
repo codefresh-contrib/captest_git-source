@@ -88,8 +88,10 @@ spec:
 
   # Add a trigger (creates workflow) for each dependency
   triggers:
-    - template:
-        conditions: "multiservice-test"  # you can combine dependencies with && and ||
+    - retryStrategy:
+        steps: 3
+      template:
+        # conditions: "multiservice-test"  # you can combine dependencies with && and ||
         name: multiservice-test
         argoWorkflow:
           version: v1alpha1
