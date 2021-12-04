@@ -160,10 +160,10 @@ spec:
                 dependencyName: multiservice-test
                 dataKey: body.head_commit.url
             - dest: spec.arguments.parameters.9.value  # ARGOCD_APP
-              value: multiservice-test
+                value: multiservice-test
             - dest: spec.arguments.parameters.10.value # ARGOCD_SERVER
-              # K8s-internal DNS address of the Argo CD service
-              value: argocd-server.captest
+                # K8s-internal DNS address of the Argo CD service
+                value: argocd-server.captest
     # - template:
     #     conditions: "multiservice-qa"  # you can combine dependencies with && and ||
     #     name: multiservice-qa
