@@ -1,5 +1,8 @@
-# To debug:
-# kubectl describe sensor multiservice-cd
+# To debug a sensor
+# 1. get or describe the sensor to look for obvious errors in its "status"
+#    kubectl describe sensor multiservice-cd-test | tail -12
+# 2. Check the sensor pod's logs
+#    kubectl logs multiservice-cd-test-7zswg-8dcc5985-qx2xw | less
 
 apiVersion: argoproj.io/v1alpha1
 kind: Sensor
@@ -30,7 +33,7 @@ spec:
             type: string
             value:
               - "true"
-            template: "{{ contains '\"test/' .Input }}"
+            template: '{{ contains \"test/ .Input }}'
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
