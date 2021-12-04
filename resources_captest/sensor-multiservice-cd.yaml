@@ -23,11 +23,11 @@ spec:
             value:
               - example-multiservice-deploy2
           # filter monorepo changes for only the "test" subdirectory
-          - path: body.head_commit.modified
-            type: string
-            value:
-              - "test/"
-            template: "{{ substr 0 4 .Input }}"
+          # - path: body.head_commit.modified
+          #   type: string
+          #   value:
+          #     - "test/"
+          #   template: "{{ substr 0 5 .Input }}"
     - name: multiservice-qa
       eventSourceName: github1
       eventName: push
