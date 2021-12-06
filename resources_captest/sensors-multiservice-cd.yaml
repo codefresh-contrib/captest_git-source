@@ -79,6 +79,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
+                      value: blah
                     - name: ARGOCD_APP
                       value: multiservice-test
                     - name: ARGOCD_SERVER
@@ -122,12 +123,12 @@ spec:
               src:
                 dependencyName: multiservice-test
                 dataKey: body.head_commit.url
-            - dest: spec.arguments.parameters.9.value  # GIT_COMMIT_URL
-              src:
-                dependencyName: multiservice-test
-                dataKey: body.commits
-                value: "default val"
-              value: "default val"
+            # - dest: spec.arguments.parameters.9.value  # GIT_COMMIT_URL
+            #   src:
+            #     dependencyName: multiservice-test
+            #     dataKey: body.commits
+            #     value: "default val"
+            #   value: "default val"
 
 ---
 apiVersion: argoproj.io/v1alpha1
