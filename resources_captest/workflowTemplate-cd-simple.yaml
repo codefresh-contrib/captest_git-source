@@ -25,8 +25,12 @@ spec:
     steps:
     # - - name: slack-announce-start-deployment
     #     template: slack-notfier
-    # - - name: log-info
-    #     template: log-info
+    - - name: log-info
+        template: log-info
+        arguments:
+          parameters:
+          - name: INFO
+            value: "{{ workflow.parameters | join \"\n\" }}"
     - - name: argocd-sync
         templateRef:
           name: codefresh.argo-library
@@ -45,13 +49,14 @@ spec:
     #     template: service-test
     # - - name: slack-announce-finish-deployment
     #     template: slack-notfier
-  # - name: log-info
-  #   script:
-  #     image: alpine:latest
-  #     command: ["/bin/sh"]
-  #     env:
-  #     - name: INFO
-  #       value: "{{ workflow.parameters | join \"\n\" }}"
-  #     source: |
-  #       set -e
-  #       echo ${INFO}
+
+  - name: log-info
+    script:
+      image: alpine:latest
+      command: ["/bin/sh"]
+      env:
+      - name: INFO
+        value: '{{ inputs.parameters.INFO }}'
+      source: |
+        set -e
+        echo ${INFO}
