@@ -1,0 +1,103 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: codefresh.argocd-library
+  labels:
+    owner: codefresh
+
+spec:
+  # Metadata that gets attached to the running workflow
+  workflowMetadata:
+    labels:
+      io.codefresh.argocd-library: true
+
+  # default arguments
+  arguments:
+    parameters:
+    # The app (or label for argo-sync-label) to run the argo command against
+    - name: app
+    # The url for communicating with the ArgoCD server
+    # i.e. svc.<namespace>.svc.cluster.local
+    - name: argocdUrl
+    # Command line options to pass to the ArgoCD CLI
+    - name: argocdOpts
+      value: "--insecure --plaintext"
+    # The Kubernetes secret with the token to communicate with ArgoCD
+    - name: argocdTokenSecret
+      value: "argocd-token"
+    # The key name in the Kubernetes secret with the token to communicate with ArgoCD
+    - name: argocdTokenSecretKey
+      value: "token"
+    # The Kubernetes 'Kind' to use with argo app actions command
+    - name: appKind
+      value: "Rollout"
+
+  templates:
+  - name: argocd-sync
+    container: &container
+      # Image, command and arguments to use
+      image: jcantosz/argocd-cli:latest
+      command: ['argocd']
+      args: ['app', 'sync', '{{inputs.parameters.app}}']
+      env:
+      # URL to communicate with ArgoCD
+      - name: ARGOCD_SERVER
+        value: '{{inputs.parameters.argocdUrl}}'
+      # Token to use to communicate with ArgoCD
+      - name: ARGOCD_AUTH_TOKEN
+        valueFrom:
+
+          secretKeyRef:
+            name: '{{inputs.parameters.argocdTokenSecret}}'
+            key: '{{inputs.parameters.argocdTokenSecretKey}}'
+      # CLI falgs to use
+      - name: ARGOCD_OPTS
+        value: '{{inputs.parameters.argocdOpts}}'
+    # Parameters users can set/override
+    inputs: &inputs
+      parameters:
+      - name: appName
+      - name: argocdUrl
+      - name: argocdTokenSecret
+      - name: argocdTokenSecretKey
+      - name: argocdOpts
+      - name: appKind # used for app 'actions' commands
+
+  - name: argocd-sync-label
+    container:
+      <<: *container
+      args: ['app', 'sync', '-l', '{{inputs.parameters.app}}']
+    inputs:
+      <<: *inputs
+
+  # https://argoproj.github.io/argo-rollouts/FAQ/#can-we-run-the-argo-rollouts-kubectl-plugin-commands-via-argo-cd
+  # https://argoproj.github.io/argo-rollouts/features/restart/
+  # Resume a rollout
+  - name: argocd-rollout-resume
+    container:
+      <<: *container
+      args: ['app', 'actions', 'run', '{{inputs.parameters.app}}', 'resume', '--kind', '{{inputs.parameters.appKind}}']
+    inputs:
+      <<: *inputs
+
+  # Restart a rollout
+  - name: argocd-rollout-restart
+    container:
+      <<: *container
+      args: ['app', 'actions', 'run', '{{inputs.parameters.app}}', 'restart', '--kind', '{{inputs.parameters.appKind}}']
+    inputs:
+      <<: *inputs
+
+  - name: argocd-app-list
+    container:
+      <<: *container
+      args: ['app', 'list']
+    inputs:
+      <<: *inputs
+
+## jcantosz/argocd-cli:
+# cat Dockerfile
+# FROM alpine
+#
+# RUN wget -O /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 \
+#  && chmod +x /usr/local/bin/argocd
