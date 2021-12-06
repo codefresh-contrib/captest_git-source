@@ -126,6 +126,7 @@ spec:
               src:
                 dependencyName: multiservice-test
                 dataKey: body.commits
+                value: "default val"
 
 ---
 apiVersion: argoproj.io/v1alpha1
