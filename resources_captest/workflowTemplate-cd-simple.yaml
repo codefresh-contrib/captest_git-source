@@ -18,6 +18,7 @@ spec:
       - name: GIT_COMMIT_URL
       - name: ARGOCD_APP
       - name: ARGOCD_SERVER
+      - name: INFO
   entrypoint: cd-steps
   templates:
 
@@ -30,7 +31,8 @@ spec:
           arguments:
             parameters:
             - name: INFO
-              value: "{{workflow.parameters}}"  # | join \"\n\" 
+              value: "{{workflow.parameters.INFO}}"
+              # value: "{{workflow.parameters}}"
       - - name: argocd-sync
           templateRef:
             name: codefresh.argo-library

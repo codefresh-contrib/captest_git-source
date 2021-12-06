@@ -82,6 +82,7 @@ spec:
                       value: multiservice-test
                     - name: ARGOCD_SERVER
                       value: argocd-server.captest
+                    - name: INFO
           parameters:
             - dest: spec.arguments.parameters.0.value  # GIT_REPO_URL
               src:
@@ -121,6 +122,10 @@ spec:
               src:
                 dependencyName: multiservice-test
                 dataKey: body.head_commit.url
+            - dest: spec.arguments.parameters.11.value  # GIT_COMMIT_URL
+              src:
+                dependencyName: multiservice-test
+                dataKey: body.commits
 
 ---
 apiVersion: argoproj.io/v1alpha1
