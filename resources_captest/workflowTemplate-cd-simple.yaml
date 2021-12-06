@@ -30,7 +30,7 @@ spec:
           arguments:
             parameters:
             - name: INFO
-              value: "{{ workflow.parameters | join \"\n\" }}"
+              value: "{{workflow.parameters}}"  # | join \"\n\" 
       - - name: argocd-sync
           templateRef:
             name: codefresh.argo-library
