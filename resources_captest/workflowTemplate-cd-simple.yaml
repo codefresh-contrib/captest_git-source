@@ -16,9 +16,9 @@ spec:
       - name: GIT_REPO_NAME
       - name: GIT_COMMIT_MESSAGE
       - name: GIT_COMMIT_URL
+      - name: INFO
       - name: ARGOCD_APP
       - name: ARGOCD_SERVER
-      - name: INFO
   entrypoint: cd-steps
   templates:
 
