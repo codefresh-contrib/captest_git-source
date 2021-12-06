@@ -7,59 +7,59 @@ spec:
     # Any params you want to pass into the workflow from the sensor should be listed here
     # Pass them into templates like this: "{{workflow.parameters.GIT_REPO}}"
     parameters:
-    - name: GIT_REPO_URL
-    - name: GIT_REVISION
-    - name: GIT_BRANCH
-    - name: GIT_FILES_MODIFIED
-    - name: GIT_FILES_ADDED
-    - name: GIT_REPO_OWNER
-    - name: GIT_REPO_NAME
-    - name: GIT_COMMIT_MESSAGE
-    - name: GIT_COMMIT_URL
-    - name: ARGOCD_APP
-    - name: ARGOCD_SERVER
+      - name: GIT_REPO_URL
+      - name: GIT_REVISION
+      - name: GIT_BRANCH
+      - name: GIT_FILES_MODIFIED
+      - name: GIT_FILES_ADDED
+      - name: GIT_REPO_OWNER
+      - name: GIT_REPO_NAME
+      - name: GIT_COMMIT_MESSAGE
+      - name: GIT_COMMIT_URL
+      - name: ARGOCD_APP
+      - name: ARGOCD_SERVER
   entrypoint: cd-steps
   templates:
 
-  - name: cd-steps
-    steps:
-    # - - name: slack-announce-start-deployment
-    #     template: slack-notfier
-    - - name: log-info
-        template: log-info
-        arguments:
-          parameters:
-          - name: INFO
-            value: "{{ workflow.parameters | join \"\n\" }}"
-    - - name: argocd-sync
-        templateRef:
-          name: codefresh.argo-library
-          template: argocd-sync
-        arguments:
-          parameters:
-          - name: APP
-            # value: multiservice-test
-            value: "{{workflow.parameters.ARGOCD_APP}}"
-          - name: SERVER
-            # value: argocd-server.captest
-            value: "{{workflow.parameters.ARGOCD_SERVER}}"
-          - name: WAIT_FLAGS
-            value: "--health"
-    # - - name: canary-test
-    #     template: service-test
-    # - - name: slack-announce-finish-deployment
-    #     template: slack-notfier
+    - name: cd-steps
+      steps:
+      # - - name: slack-announce-start-deployment
+      #     template: slack-notfier
+      - - name: log-info
+          template: log-info
+          arguments:
+            parameters:
+            - name: INFO
+              value: "{{ workflow.parameters | join \"\n\" }}"
+      - - name: argocd-sync
+          templateRef:
+            name: codefresh.argo-library
+            template: argocd-sync
+          arguments:
+            parameters:
+            - name: APP
+              # value: multiservice-test
+              value: "{{workflow.parameters.ARGOCD_APP}}"
+            - name: SERVER
+              # value: argocd-server.captest
+              value: "{{workflow.parameters.ARGOCD_SERVER}}"
+            - name: WAIT_FLAGS
+              value: "--health"
+      # - - name: canary-test
+      #     template: service-test
+      # - - name: slack-announce-finish-deployment
+      #     template: slack-notfier
 
-  - name: log-info
-    inputs:
-    parameters:
-    - name: INFO
-    script:
-      image: alpine:latest
-      command: ["/bin/sh"]
-      env:
-      - name: INFO
-        value: "{{ inputs.parameters.INFO }}"
-      source: |
-        set -e
-        echo ${INFO}
+    - name: log-info
+      inputs:
+        parameters:
+          - name: INFO
+      script:
+        image: alpine:latest
+        command: ["/bin/sh"]
+        env:
+          - name: INFO
+            value: "{{ inputs.parameters.INFO }}"
+        source: |
+          set -e
+          echo ${INFO}
