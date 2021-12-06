@@ -59,7 +59,7 @@ spec:
       command: ["/bin/sh"]
       env:
       - name: INFO
-        value: "{{ inputs.parameters.INFO }}""
+        value: "{{ inputs.parameters.INFO }}"
       source: |
         set -e
         echo ${INFO}
