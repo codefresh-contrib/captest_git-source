@@ -421,6 +421,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
+                      value: default-val
                     - name: ARGOCD_APP
                       value: multiservice-prod
                     - name: ARGOCD_SERVER
@@ -468,4 +469,4 @@ spec:
               src:
                 dependencyName: multiservice-test
                 dataKey: body
-                value: default-val
+                # value: default-val
