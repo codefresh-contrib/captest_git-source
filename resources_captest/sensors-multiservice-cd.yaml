@@ -384,7 +384,7 @@ spec:
           # filter monorepo changes for only the "prod" subdirectory
           # Example body.head_commit.modified string: '["prod/values.yaml", "prod/chart.yaml"]'
           # - path: body.head_commit.modified
-          - path: body.commits.#(*).modified
+          - path: '{body.commits.#.modified,body.commits.#.added}'
             type: string
             value:
               - "true"
@@ -469,5 +469,5 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-prod
-                dataKey: body.commits.#(*).modified
+                dataKey: '{body.commits.#.modified,body.commits.#.added}'
                 # value: default-val
