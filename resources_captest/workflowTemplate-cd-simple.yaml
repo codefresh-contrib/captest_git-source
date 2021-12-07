@@ -30,7 +30,7 @@ spec:
           arguments:
             parameters:
             - name: INFO
-              value: "{{workflow.outputs.parameters}}"
+              value: "{{workflow.outputs.parameters.CF_REPO_OWNER}}/{{workflow.outputs.parameters.CF_REPO_NAME}}"
               # value: "{{workflow.parameters}}"
       - - name: argocd-sync
           templateRef:
