@@ -383,7 +383,8 @@ spec:
               - example-multiservice-deploy2
           # filter monorepo changes for only the "prod" subdirectory
           # Example body.head_commit.modified string: '["prod/values.yaml", "prod/chart.yaml"]'
-          - path: body.head_commit.modified
+          # - path: body.head_commit.modified
+          - path: body.commits
             type: string
             value:
               - "true"
@@ -421,7 +422,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
-                      value: default-val
+                      # value: default-val
                     - name: ARGOCD_APP
                       value: multiservice-prod
                     - name: ARGOCD_SERVER
@@ -468,5 +469,5 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-prod
-                dataKey: body
+                dataKey: body.commits
                 # value: default-val
