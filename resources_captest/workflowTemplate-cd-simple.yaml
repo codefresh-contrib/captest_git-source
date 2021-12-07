@@ -17,12 +17,20 @@ spec:
       steps:
       # - - name: slack-announce-start-deployment
       #     template: slack-notfier
+      - - name: get-github-info
+          templateRef:
+            name: codefresh.github
+            template: get-github-info
+          arguments:
+            parameters:
+            - name: GITHUB_JSON
+              value: "{{workflow.parameters.GITHUB_JSON}}"
       - - name: log-info
           template: log-info
           arguments:
             parameters:
             - name: INFO
-              value: "{{workflow.parameters.GITHUB_JSON}}"
+              value: "{{workflow.outputs.parameters}}"
               # value: "{{workflow.parameters}}"
       - - name: argocd-sync
           templateRef:
