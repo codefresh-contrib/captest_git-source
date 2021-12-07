@@ -25,12 +25,12 @@ spec:
             parameters:
             - name: GITHUB_JSON
               value: "{{workflow.parameters.GITHUB_JSON}}"
-      - - name: log-info
-          template: log-info
-          arguments:
-            parameters:
-            - name: INFO
-              value: "{{workflow.outputs.parameters.CF_REPO_OWNER}}/{{workflow.outputs.parameters.CF_REPO_NAME}}"
+      # - - name: log-info
+      #     template: log-info
+      #     arguments:
+      #       parameters:
+      #       - name: INFO
+      #         value: "{{workflow.outputs.parameters.CF_REPO_OWNER}}/{{workflow.outputs.parameters.CF_REPO_NAME}}"
               # value: "{{workflow.parameters}}"
       - - name: argocd-sync
           templateRef:
