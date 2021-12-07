@@ -39,13 +39,13 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # filter monorepo changes for only the "test" subdirectory
-          # Example body.head_commit.modified string: '["test/values.yaml", "test/chart.yaml"]'
-          - path: body.head_commit.modified
+          # Filter monorepo changes+additions for only the "test" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added}'
             type: string
+            # Example string: {"modified":[["test/values.yaml", "test/chart.yaml"]],"added":[["test/mynewfile"]]}
+            template: '{{ contains "\"test/" .Input }}'
             value:
               - "true"
-            template: '{{ contains "\"test/" .Input }}'
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
@@ -79,6 +79,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
+                      # value: default-val
                     - name: ARGOCD_APP
                       value: multiservice-test
                     - name: ARGOCD_SERVER
@@ -125,9 +126,7 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-test
-                dataKey: body.commits
-                value: "default val"
-              value: "default val"
+                dataKey: body
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -153,13 +152,13 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # filter monorepo changes for only the "qa" subdirectory
-          # Example body.head_commit.modified string: '["qa/values.yaml", "qa/chart.yaml"]'
-          - path: body.head_commit.modified
+          # Filter monorepo changes+additions for only the "qa" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added}'
             type: string
+            # Example string: {"modified":[["qa/values.yaml", "qa/chart.yaml"]],"added":[["qa/mynewfile"]]}
+            template: '{{ contains "\"qa/" .Input }}'
             value:
               - "true"
-            template: '{{ contains "\"qa/" .Input }}'
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
@@ -193,6 +192,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
+                      # value: default-val
                     - name: ARGOCD_APP
                       value: multiservice-qa
                     - name: ARGOCD_SERVER
@@ -239,9 +239,7 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-qa
-                dataKey: body.commits
-                value: "default val"
-              value: "default val"
+                dataKey: '{body.commits.#.modified,body.commits.#.added}'
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -267,13 +265,13 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # filter monorepo changes for only the "stage" subdirectory
-          # Example body.head_commit.modified string: '["stage/values.yaml", "stage/chart.yaml"]'
-          - path: body.head_commit.modified
+          # Filter monorepo changes+additions for only the "stage" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added}'
             type: string
+            # Example string: {"modified":[["stage/values.yaml", "stage/chart.yaml"]],"added":[["stage/mynewfile"]]}
+            template: '{{ contains "\"stage/" .Input }}'
             value:
               - "true"
-            template: '{{ contains "\"stage/" .Input }}'
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
@@ -307,6 +305,7 @@ spec:
                     - name: GIT_COMMIT_MESSAGE
                     - name: GIT_COMMIT_URL
                     - name: INFO
+                      # value: default-val
                     - name: ARGOCD_APP
                       value: multiservice-stage
                     - name: ARGOCD_SERVER
@@ -353,9 +352,7 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-stage
-                dataKey: body.commits
-                value: "default val"
-              value: "default val"
+                dataKey: '{body.commits.#.modified,body.commits.#.added}'
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -381,14 +378,13 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # filter monorepo changes for only the "prod" subdirectory
-          # Example body.head_commit.modified string: '["prod/values.yaml", "prod/chart.yaml"]'
-          # - path: body.head_commit.modified
+          # Filter monorepo changes+additions for only the "prod" subdirectory
           - path: '{body.commits.#.modified,body.commits.#.added}'
             type: string
+            # Example string: {"modified":[["prod/values.yaml", "prod/chart.yaml"]],"added":[["prod/mynewfile"]]}
+            template: '{{ contains "\"prod/" .Input }}'
             value:
               - "true"
-            template: '{{ contains "\"prod/" .Input }}'
   # Trigger fires the workflow
   triggers:
     - retryStrategy:
@@ -470,4 +466,3 @@ spec:
               src:
                 dependencyName: multiservice-prod
                 dataKey: '{body.commits.#.modified,body.commits.#.added}'
-                # value: default-val
