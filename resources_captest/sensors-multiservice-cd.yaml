@@ -5,10 +5,6 @@
 #    dependencies that all refer to the same eventSourceName + eventSource. So you must create 4 separate sensors, each
 #    with 1 dependency for 1 environment.
 
-# TO-DO
-# -  Enhance GIT_FILES_MODIFIED and GIT_FILES_ADDED to include files from ALL commits in the push. They currently only
-#    include files from the last commit (HEAD) in the push.
-
 # To debug a sensor:
 # 1. get or describe the sensor to look for obvious errors in its "status"
 #    kubectl describe sensor multiservice-cd-test | tail -12
@@ -39,10 +35,10 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # Filter monorepo changes+additions for only the "test" subdirectory
-          - path: '{body.commits.#.modified,body.commits.#.added}'
+          # Filter monorepo changes+additions+deletions for only the "test" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added,body.commits.#.removed}'
             type: string
-            # Example string: {"modified":[["test/values.yaml", "test/chart.yaml"]],"added":[["test/mynewfile"]]}
+            # Example string: {"modified":[["test/values.yaml", "test/chart.yaml"]],"added":[["test/mynewfile"]],"removed":[["test/ingress.yaml"]]}
             template: '{{ contains "\"test/" .Input }}'
             value:
               - "true"
@@ -152,10 +148,10 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # Filter monorepo changes+additions for only the "qa" subdirectory
-          - path: '{body.commits.#.modified,body.commits.#.added}'
+          # Filter monorepo changes+additions+deletions for only the "qa" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added,body.commits.#.removed}'
             type: string
-            # Example string: {"modified":[["qa/values.yaml", "qa/chart.yaml"]],"added":[["qa/mynewfile"]]}
+            # Example string: {"modified":[["qa/values.yaml", "qa/chart.yaml"]],"added":[["qa/mynewfile"]],"removed":[["qa/ingress.yaml"]]}
             template: '{{ contains "\"qa/" .Input }}'
             value:
               - "true"
@@ -265,10 +261,10 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # Filter monorepo changes+additions for only the "stage" subdirectory
-          - path: '{body.commits.#.modified,body.commits.#.added}'
+          # Filter monorepo changes+additions+deletions for only the "stage" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added,body.commits.#.removed}'
             type: string
-            # Example string: {"modified":[["stage/values.yaml", "stage/chart.yaml"]],"added":[["stage/mynewfile"]]}
+            # Example string: {"modified":[["stage/values.yaml", "stage/chart.yaml"]],"added":[["stage/mynewfile"]],"removed":[["stage/ingress.yaml"]]}
             template: '{{ contains "\"stage/" .Input }}'
             value:
               - "true"
@@ -378,10 +374,10 @@ spec:
             type: string
             value:
               - example-multiservice-deploy2
-          # Filter monorepo changes+additions for only the "prod" subdirectory
-          - path: '{body.commits.#.modified,body.commits.#.added}'
+          # Filter monorepo changes+additions+deletions for only the "prod" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added,body.commits.#.removed}'
             type: string
-            # Example string: {"modified":[["prod/values.yaml", "prod/chart.yaml"]],"added":[["prod/mynewfile"]]}
+            # Example string: {"modified":[["prod/values.yaml", "prod/chart.yaml"]],"added":[["prod/mynewfile"]],"removed":[["prod/ingress.yaml"]]}
             template: '{{ contains "\"prod/" .Input }}'
             value:
               - "true"
