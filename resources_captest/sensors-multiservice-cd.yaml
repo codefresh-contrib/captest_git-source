@@ -467,6 +467,4 @@ spec:
             - dest: spec.arguments.parameters.9.value  # INFO
               src:
                 dependencyName: multiservice-test
-                dataKey: body.commits
-                value: "default val"
-              value: "default val"
+                dataKey: body
