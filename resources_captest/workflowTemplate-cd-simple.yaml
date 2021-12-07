@@ -7,16 +7,7 @@ spec:
     # Any params you want to pass into the workflow from the sensor should be listed here
     # Pass them into templates like this: "{{workflow.parameters.GIT_REPO}}"
     parameters:
-      - name: GIT_REPO_URL
-      - name: GIT_REVISION
-      - name: GIT_BRANCH
-      - name: GIT_FILES_MODIFIED
-      - name: GIT_FILES_ADDED
-      - name: GIT_REPO_OWNER
-      - name: GIT_REPO_NAME
-      - name: GIT_COMMIT_MESSAGE
-      - name: GIT_COMMIT_URL
-      - name: INFO
+      - name: GITHUB_JSON
       - name: ARGOCD_APP
       - name: ARGOCD_SERVER
   entrypoint: cd-steps
@@ -31,7 +22,7 @@ spec:
           arguments:
             parameters:
             - name: INFO
-              value: "{{workflow.parameters.INFO}}"
+              value: "{{workflow.parameters.GITHUB_JSON}}"
               # value: "{{workflow.parameters}}"
       - - name: argocd-sync
           templateRef:
