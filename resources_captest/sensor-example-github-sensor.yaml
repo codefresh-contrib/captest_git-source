@@ -7,7 +7,7 @@ metadata:
 spec:
   eventBusName: codefresh-eventbus
   template:
-    serviceAccountName: argo-hub.github.0.0.2
+    serviceAccountName: codefresh-marketplace.github.0.0.2
   dependencies:
     - name: github-dep
       eventSourceName: github1
@@ -29,7 +29,7 @@ spec:
               spec:
                 workflowTemplateRef:
                   name: example-steps
-                serviceAccountName: argo-hub.github.0.0.2
+                serviceAccountName: codefresh-marketplace.github.0.0.2
                 arguments:
                   parameters:
                     - name: GITHUB_JSON
