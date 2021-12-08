@@ -6,7 +6,7 @@ metadata:
 spec:
   eventBusName: codefresh-eventbus
   template:
-    serviceAccountName: codefresh-marketplace.github.0.0.2
+    serviceAccountName: argo
   dependencies:
     - name: github-dep
       eventSourceName: github1
