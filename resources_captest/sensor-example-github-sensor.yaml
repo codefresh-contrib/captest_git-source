@@ -1,0 +1,81 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: example-github-sensor
+spec:
+  eventBusName: codefresh-eventbus
+  template:
+    serviceAccountName: argo-hub.github.0.0.2
+  dependencies:
+    - name: github-dep
+      eventSourceName: github1
+      eventName: push
+  triggers:
+    - template:
+        name: example-github
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: example-github-
+              spec:
+                workflowTemplateRef:
+                  name: example-steps
+                serviceAccountName: argo-hub.github.0.0.2
+                arguments:
+                  parameters:
+                    - name: GITHUB_JSON
+          parameters:
+            - dest: spec.arguments.parameters.0.value
+              src:
+                dependencyName: github-dep
+                dataKey: body
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: example-steps
+spec:
+  arguments:
+    parameters:
+      - name: GITHUB_JSON
+  entrypoint: example-steps
+  templates:
+    - name: example-steps
+      steps:
+      # 1. Store GitHub info as global workflow outputs
+      - - name: get-github-info
+          templateRef:
+            name: codefresh.github
+            template: get-github-info
+          arguments:
+            parameters:
+            - name: GITHUB_JSON
+              value: "{{workflow.parameters.GITHUB_JSON}}"
+      # 2. Consume some global workflow outputs in a subsequent step
+      - - name: log-info
+          template: log-info
+          arguments:
+            parameters:
+            - name: INFO
+              value: "{{workflow.outputs.parameters.CF_REPO_OWNER}}/{{workflow.outputs.parameters.CF_REPO_NAME}}"
+    - name: log-info
+      inputs:
+        parameters:
+          - name: INFO
+      script:
+        image: alpine:latest
+        command: ["/bin/sh"]
+        env:
+          - name: INFO
+            value: "{{ inputs.parameters.INFO }}"
+        source: |
+          set -e
+          echo ${INFO}
