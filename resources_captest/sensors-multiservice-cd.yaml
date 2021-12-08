@@ -63,6 +63,7 @@ spec:
               spec:
                 workflowTemplateRef:
                   name: cd-simple
+                serviceAccountName: argo
                 arguments:
                   parameters:
                     - name: GITHUB_JSON
