@@ -1,5 +1,5 @@
-# Create global workflow outputs for all of the Classic Codefresh git-related pipeline variables,
-# documented here: https://codefresh.io/docs/docs/codefresh-yaml/variables
+# Create global workflow output equivalents to all of the Classic Codefresh git pipeline
+# variables, documented here: https://codefresh.io/docs/docs/codefresh-yaml/variables
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
