@@ -14,90 +14,123 @@ spec:
   # default arguments
   arguments:
     parameters:
-    # The app (or label for argo-sync-label) to run the argo command against
+    # The app to run the argo command against
     - name: app
+      value: ""
+    # Flags specific to the command you are running (i.e. -l "my-label")
+    - name: flags
+      value: ""
     # The url for communicating with the ArgoCD server
     # i.e. svc.<namespace>.svc.cluster.local
-    - name: argocdUrl
-    # Command line options to pass to the ArgoCD CLI
-    - name: argocdOpts
+    - name: serverUrl
+    # Global command line options to pass to the ArgoCD CLI
+    - name: opts
       value: "--insecure --plaintext"
     # The Kubernetes secret with the token to communicate with ArgoCD
-    - name: argocdTokenSecret
+    - name: tokenSecret
       value: "argocd-token"
     # The key name in the Kubernetes secret with the token to communicate with ArgoCD
-    - name: argocdTokenSecretKey
+    - name: tokenSecretKey
       value: "token"
     # The Kubernetes 'Kind' to use with argo app actions command
     - name: appKind
       value: "Rollout"
+    # Set xtrace or not (echo the command before running it). Valid options are -o (xtrace on) and +o (xtrace off). default is -o
+    - name: xtraceOption
+      value: '-o'
 
   templates:
-  - name: argocd-sync
+  - name: sync
     container: &container
       # Image, command and arguments to use
       image: jcantosz/argocd-cli:latest
-      command: ['argocd']
-      args: ['app', 'sync', '{{inputs.parameters.app}}']
+      # xtrace
+      command: ['sh', '{{inputs.parameters.xtraceOption}}', 'xtrace', '-c']
+      args:
+      - 'argocd app sync {{inputs.parameters.app}} {{inputs.parameters.flags}}'
       env:
       # URL to communicate with ArgoCD
       - name: ARGOCD_SERVER
-        value: '{{inputs.parameters.argocdUrl}}'
+        value: '{{inputs.parameters.serverUrl}}'
       # Token to use to communicate with ArgoCD
       - name: ARGOCD_AUTH_TOKEN
         valueFrom:
-
           secretKeyRef:
-            name: '{{inputs.parameters.argocdTokenSecret}}'
-            key: '{{inputs.parameters.argocdTokenSecretKey}}'
+            name: '{{inputs.parameters.tokenSecret}}'
+            key: '{{inputs.parameters.tokenSecretKey}}'
       # CLI falgs to use
       - name: ARGOCD_OPTS
-        value: '{{inputs.parameters.argocdOpts}}'
+        value: '{{inputs.parameters.opts}}'
     # Parameters users can set/override
     inputs: &inputs
       parameters:
-      - name: appName
-      - name: argocdUrl
-      - name: argocdTokenSecret
-      - name: argocdTokenSecretKey
-      - name: argocdOpts
+      - name: app
+      - name: flags
+      - name: serverUrl
+      - name: tokenSecret
+      - name: tokenSecretKey
+      - name: opts
       - name: appKind # used for app 'actions' commands
-
-  - name: argocd-sync-label
-    container:
-      <<: *container
-      args: ['app', 'sync', '-l', '{{inputs.parameters.app}}']
-    inputs:
-      <<: *inputs
+      - name: xtraceOption
 
   # https://argoproj.github.io/argo-rollouts/FAQ/#can-we-run-the-argo-rollouts-kubectl-plugin-commands-via-argo-cd
   # https://argoproj.github.io/argo-rollouts/features/restart/
   # Resume a rollout
-  - name: argocd-rollout-resume
+  - name: rollout-resume
     container:
       <<: *container
-      args: ['app', 'actions', 'run', '{{inputs.parameters.app}}', 'resume', '--kind', '{{inputs.parameters.appKind}}']
+      args:
+      - 'argocd app actions run {{inputs.parameters.app}} resume --kind {{inputs.parameters.appKind}} {{inputs.parameters.flags}}'
     inputs:
       <<: *inputs
 
   # Restart a rollout
-  - name: argocd-rollout-restart
+  - name: rollout-restart
     container:
       <<: *container
-      args: ['app', 'actions', 'run', '{{inputs.parameters.app}}', 'restart', '--kind', '{{inputs.parameters.appKind}}']
+      args:
+      - 'argocd app actions run {{inputs.parameters.app}} restart --kind {{inputs.parameters.appKind}} {{inputs.parameters.flags}}'
     inputs:
       <<: *inputs
 
-  - name: argocd-app-list
+  # Wait for an app status
+  - name: app-wait
     container:
       <<: *container
-      args: ['app', 'list']
+      args:
+      - 'argocd app wait {{inputs.parameters.app}} {{inputs.parameters.flags}}'
     inputs:
       <<: *inputs
 
-## jcantosz/argocd-cli:
-# cat Dockerfile
-# FROM alpine
-#
-# RUN wget -O /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 \
-#  && chmod +x /usr/local/bin/argocd
+  # List applications
+  - name: app-list
+    container:
+      <<: *container
+      args:
+      - 'argocd app list {{inputs.parameters.flags}}'
+    inputs:
+      <<: *inputs
+
+  # Get application history
+  - name: app-history
+    container:
+      <<: *container
+      args:
+      - 'argocd app history {{inputs.parameters.app}} {{inputs.parameters.flags}}'
+    inputs:
+      <<: *inputs
+
+  # Get application history
+  - name: app-history-id-latest
+    container:
+      <<: *container
+      args:
+      - 'argocd app history {{inputs.parameters.app}} {{inputs.parameters.flags}} | head > /tmp/app-history-id.latest'
+    inputs:
+      <<: *inputs
+    outputs:
+      parameters:
+      - name: id
+        valueFrom:
+          path: /tmp/app-history-id.latest
+
