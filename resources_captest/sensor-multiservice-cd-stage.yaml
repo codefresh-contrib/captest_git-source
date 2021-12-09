@@ -1,0 +1,84 @@
+# FAQ:
+# Q: Why does the example-multiservice-deploy2 GitOps repo have 4 sensor resources instead of just 1?
+# A: The example-multiservice-deploy2 GitOps repo has subdirectories for 4 environments. In order to detect changes
+#    separately for each subdirectory, you need to define 4 dependencies. However, a sensor won't let you have multiple
+#    dependencies that all refer to the same eventSourceName + eventSource. So you must create 4 separate sensors, each
+#    with 1 dependency for 1 environment.
+
+# To debug a sensor:
+# 1. get or describe the sensor to look for obvious errors in its "status"
+#    kubectl describe sensor multiservice-cd-test | tail -12
+# 2. Check the sensor pod's logs
+#    kubectl logs multiservice-cd-test-7zswg-8dcc5985-qx2xw | less
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: multiservice-cd-stage
+spec:
+  eventBusName: codefresh-eventbus
+  template:
+    serviceAccountName: argo
+  # Specify Git conditions when the trigger should fire
+  dependencies:
+    - name: multiservice-stage
+      eventSourceName: github1
+      eventName: push
+      filters:
+        data:
+          - path: body.repository.owner.name
+            type: string
+            value:
+              - codefresh-contrib
+          - path: body.repository.name
+            type: string
+            value:
+              - example-multiservice-deploy2
+          # Filter on branch = main
+          - path: body.ref
+            type: string
+            template: "{{ trimPrefix \"refs/heads/\" .Input }}"
+            value:
+              - main
+          # Filter monorepo changes+additions+deletions for only the "stage" subdirectory
+          - path: '{body.commits.#.modified,body.commits.#.added,body.commits.#.removed}'
+            type: string
+            # Example string: {"modified":[["stage/values.yaml", "stage/chart.yaml"]],"added":[["stage/mynewfile"]],"removed":[["stage/ingress.yaml"]]}
+            template: '{{ contains "\"stage/" .Input }}'
+            value:
+              - "true"
+  # Trigger fires the workflow
+  triggers:
+    - retryStrategy:
+        steps: 3
+      template:
+        # conditions: "multiservice-stage"  # you can combine dependencies with && and ||
+        name: multiservice-cd-stage
+        argoWorkflow:
+          version: v1alpha1
+          group: argoproj.io
+          resource: workflows
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: multiservice-cd-stage-
+              spec:
+                workflowTemplateRef:
+                  name: cd-simple
+                serviceAccountName: argo
+                arguments:
+                  parameters:
+                    - name: GITHUB_JSON
+                    - name: ARGOCD_APP
+                      value: multiservice-stage
+                    - name: ARGOCD_SERVER
+                      value: argocd-server.captest
+          parameters:
+            - dest: spec.arguments.parameters.0.value  # GITHUB_JSON
+              src:
+                dependencyName: multiservice-stage
+                dataKey: body
