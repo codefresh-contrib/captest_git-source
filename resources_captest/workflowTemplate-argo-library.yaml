@@ -27,6 +27,8 @@ spec:
     script:
       image: quay.io/argoproj/argocd:release-2.1
       command: ["/bin/sh"]
+      securityContext:
+        runAsUser: 0
       env:
       - name: APP
         value: '{{ inputs.parameters.APP }}'

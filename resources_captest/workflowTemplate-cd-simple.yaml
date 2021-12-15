@@ -19,10 +19,10 @@ spec:
       #     template: slack-notfier
       - - name: get-github-info
           templateRef:
-            name: argo-hub.github.0.0.2
-            template: extract-webhook-variables
-            # name: codefresh.github
-            # template: get-github-info
+            # name: argo-hub.github.0.0.2
+            # template: extract-webhook-variables
+            name: codefresh.github
+            template: get-github-info
           arguments:
             parameters:
             - name: GITHUB_JSON
