@@ -10,13 +10,23 @@ spec:
       - name: GITHUB_JSON
       - name: ARGOCD_APP
       - name: ARGOCD_SERVER
+      - name: SLACK_HOOK_URL
+        default: 'https://hooks.slack.com/services/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'
   entrypoint: cd-steps
   templates:
 
     - name: cd-steps
       steps:
-      # - - name: slack-announce-start-deployment
-      #     template: slack-notfier
+      - - name: slack-announce-start-deployment
+          templateRef:
+            name: argo-hub.slack.0.0.1
+            template: send-message
+          arguments:
+            parameters:
+            - name: SLACK_HOOK_URL
+              value: "{{workflow.parameters.SLACK_HOOK_URL}}"
+            - name: SLACK_TEXT
+              value: "Starting deployment of Argo CD app '{{workflow.parameters.ARGOCD_APP}}'"
       - - name: get-github-info
           templateRef:
             # name: argo-hub.github.0.0.2
