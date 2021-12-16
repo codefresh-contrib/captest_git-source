@@ -81,7 +81,7 @@ spec:
             - name: serverUrl
               value: "{{workflow.parameters.ARGOCD_SERVER}}"
             - name: flags
-              value: '--health'
+              value: '--health --insecure --plaintext'
       # - - name: canary-test
       #     template: service-test
       # - - name: slack-announce-finish-deployment
