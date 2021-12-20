@@ -68,8 +68,8 @@ spec:
               value: "{{workflow.parameters.ARGOCD_APP}}"
             - name: serverUrl
               value: "{{workflow.parameters.ARGOCD_SERVER}}"
-            - name: flags
-              value: "--insecure --plaintext"
+            - name: opts
+              value: '--insecure --plaintext'
       - - name: wait
           templateRef:
             name: argo-hub.argocd.0.0.1
@@ -80,8 +80,10 @@ spec:
               value: "{{workflow.parameters.ARGOCD_APP}}"
             - name: serverUrl
               value: "{{workflow.parameters.ARGOCD_SERVER}}"
+            - name: opts
+              value: '--insecure --plaintext'
             - name: flags
-              value: '--health --insecure --plaintext'
+              value: '--health'
       # - - name: canary-test
       #     template: service-test
       # - - name: slack-announce-finish-deployment
