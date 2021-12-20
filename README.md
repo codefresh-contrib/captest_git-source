@@ -1,6 +1,6 @@
 # captest_git-source
 
-This is the Default Git Source repo for a demo Codefresh Software Delivery Platform runtime. While this runtime is no longer installed in my demo environment, I keep this repo around to illustrate which files need to updated for a successful Runtime installation. Some links below use this repo's git history.
+This is the Default Git Source repo for a demo Codefresh Software Delivery Platform runtime. While this runtime is no longer installed in my demo environment, I keep this repo around to illustrate which files need to updated for a successful Runtime installation. Some of the links below are from this repo.
 
 The related Runtime GitOps repo is https://github.com/codefresh-contrib/captest.
 
